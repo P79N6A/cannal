@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<!-- - Root application context for the Countries application. - Web-specific 
+	beans are defined in "countries-servlet.xml". -->
+<beans>
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> 
+		<property name="jndiName" value="java:comp/env/jdbc/bitcube"/> </bean> -->
+	<!-- sql server 2008 <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/> 
+		<property name="url" value="jdbc:sqlserver://localhost:1433;DatabaseName=law_database"/> 
+		<property name="username" value="sa"/> <property name="password" value="bit2015"/> 
+		</bean> -->
+	<!-- oralce 9i <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/> 
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/> <property 
+		name="username" value="zngl"/> <property name="password" value="zngl"/> </bean> -->
+	<!-- 本地 <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/> 
+		<property name="url" value="jdbc:oracle:thin:@222.194.76.63:1521:orcl"/> 
+		<property name="username" value="sqy"/> <property name="password" value="sqy"/> 
+		</bean> -->
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/> 
+		<property name="url" value="jdbc:oracle:thin:@192.168.0.99:1521:demo92"/> 
+		<property name="username" value="hgeam"/> <property name="password" value="hgeam"/> 
+		</bean> -->
+	<!-- mysql -->
+	 <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+		<!--<property name="driverClassName" value="com.mysql.jdbc.Driver"/> <property -->
+		<!--name="url" value="jdbc:mysql://localhost:3306/qdqg?characterEncoding=utf8&amp;useSSL=true"/> -->
+		<!--<property name="username" value="root"/> <property name="password" value="root"/>-->
+	<!--</bean>-->
+
+	<!-- 属性文件配置 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- dbcp -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		  destroy-method="close">
+		<property name="driverClassName" value="${driverClassName}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<!-- 连接初始值，连接池启动时创建的连接数量的初始值  默认值是0 -->
+		<property name="initialSize" value="3" />
+		<!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请  默认值是0 -->
+		<property name="minIdle" value="3" />
+		<!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制  默认值是8 -->
+		<property name="maxIdle" value="5" />
+		<!-- 连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制   默认值是8 -->
+		<property name="maxActive" value="15" />
+
+		<property name="minEvictableIdleTimeMillis" value="1800000" />
+		<property name="numTestsPerEvictionRun"  value="3"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="testOnReturn" value="true"/>
+		<property name="validationQuery" value="SELECT 1"/>
+	</bean>
+
+	<!--<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://172.16.72.250:3306/qdqg?characterEncoding=utf8&amp;useSSL=true" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>-->
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+
+			</list>
+		</property>
+		<!--<property name="mappingDirectoryLocations">
+			<list>
+				<value>WEB-INF/config/hbm</value>
+			</list>
+		</property>-->
+		<!-- sql server <property name="hibernateProperties"> <props> <prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop> 
+			<prop key="hibernate.show_sql">true</prop> <prop key="hibernate.generate_statistics">true</prop> 
+			<prop key="hibernate.hbm2ddl.auto">update</prop> </props> </property> -->
+		<!-- oralce 9i <property name="hibernateProperties"> <props> <prop key="hibernate.dialect">org.hibernate.dialect.Oracle9iDialect</prop> 
+			<prop key="hibernate.show_sql">true</prop> <prop key="hibernate.generate_statistics">true</prop> 
+			<prop key="hibernate.hbm2ddl.auto">update</prop> </props> </property> -->
+		<!-- mysql -->
+		<!--<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>-->
+
+		<property name="eventListeners">
+			<map>
+				<entry key="merge">
+					<bean
+						class="org.springframework.orm.hibernate3.support.IdTransferringMergeEventListener" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- 1.jedisPoolConfig配置对象 -->
+	<!-- 暂时用的本地redis数据库 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<!-- 最大连接数 -->
+		<property name="maxTotal" value="20"></property>
+		<!-- 空闲最大连接数 -->
+		<property name="maxIdle" value="5"></property>
+	</bean>
+
+	<!-- 2.jedisPool连接池对象 -->
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<!-- 使用构造方法的形式注入数据 -->
+		<constructor-arg index="0" ref="jedisPoolConfig"></constructor-arg>
+		<constructor-arg index="1" type="java.lang.String" value="127.0.0.1"></constructor-arg>
+		<constructor-arg index="2" value="6379"></constructor-arg>
+	</bean>
+	
+	<!--&lt;!&ndash; 定时任务调度配置 &ndash;&gt;
+	<bean id="myJob" class="bc.redis.vb.dao.OperateRedisAndDataBaseDao"></bean>
+	<bean id="myJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="myJob"></property>
+		<property name="targetMethod" value="FromRecordToHistory"></property> 
+	</bean>
+	<bean id="myTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="myJobDetail"></property>
+		<property name="cronExpression" value="0 0 0 * * ? *"></property>
+	</bean>
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="myTrigger"/>
+			</list>
+		</property>
+	</bean>-->
+	
+
+	<bean id="autoProxyCreator"
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+		<property name="proxyTargetClass">
+			<value>true</value>
+		</property>
+	</bean>
+
+<!--	<bean id="commonDao" class="bc.sf.dao.CommonDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="metaBS" class="bc.sf.meta.bs.MetaBS">
+		<property name="dao" ref="commonDao" />
+	</bean>
+	<bean id="metaMgrBS" class="bc.sf.meta.bs.MetaMgrBS">
+		<property name="dao" ref="commonDao" />
+	</bean>
+	<bean id="powerBS" class="bc.sf.power.bs.PowerBS">
+		<property name="dao" ref="commonDao" />
+	</bean>
+	<bean id="powerMgrBS" class="bc.sf.power.bs.PowerMgrBS">
+		<property name="dao" ref="commonDao" />
+	</bean>
+	<bean id="sysBS" class="bc.sf.bs.SysBS">
+		<property name="dao" ref="commonDao" />
+		<property name="metaBS" ref="metaBS" />
+	</bean>
+	<bean id="adminBS" class="bc.admin.bs.AdminBS">
+		<property name="dao" ref="commonDao" />
+		<property name="metaBS" ref="metaBS" />
+	</bean>
+	<bean id="msgBS" class="bc.sf.msg.bs.MsgBS">
+		<property name="dao" ref="commonDao" />
+		<property name="metaBS" ref="metaBS" />
+	</bean>
+	<bean id="wfContext" class="bc.sf.workflow.data.WfContext">
+	</bean>
+	<bean id="lineInstanceBS" class="bc.sf.workflow.bs.LineInstanceBS">
+		<property name="commonDao" ref="commonDao" />
+	</bean>
+	<bean id="nodeInstanceBS" class="bc.sf.workflow.bs.NodeInstanceBS">
+		<property name="commonDao" ref="commonDao" />
+	</bean>
+	<bean id="processInstanceBS" class="bc.sf.workflow.bs.ProcessInstanceBS">
+		<property name="commonDao" ref="commonDao" />
+		<property name="nodeInstanceBS" ref="nodeInstanceBS" />
+		<property name="lineInstanceBS" ref="lineInstanceBS" />
+		<property name="wfContext" ref="wfContext" />
+	</bean>
+	<bean id="identProcessInstanceBS" class="bc.sf.workflow.bs.IdentProcessInstanceBS">
+		<property name="commonDao" ref="commonDao" />
+		<property name="nodeInstanceBS" ref="nodeInstanceBS" />
+		<property name="lineInstanceBS" ref="lineInstanceBS" />
+		<property name="wfContext" ref="wfContext" />
+	</bean>
+	<bean id="evalProcessInstanceBS" class="bc.sf.workflow.bs.EvalProcessInstanceBS">
+		<property name="commonDao" ref="commonDao" />
+		<property name="nodeInstanceBS" ref="nodeInstanceBS" />
+		<property name="lineInstanceBS" ref="lineInstanceBS" />
+		<property name="wfContext" ref="wfContext" />
+	</bean>
+	<bean id="processDefineBS" class="bc.sf.workflow.bs.ProcessDefineBS">
+	</bean>
+	<bean id="operLogBS" class="bc.sf.log.bs.OperLogBS">
+		<property name="dao" ref="commonDao" />
+		<property name="bufferSize" value="1" />
+	</bean>-->
+	
+	<!--&lt;!&ndash; 将操作redis和database的类交给spring容器管理 &ndash;&gt;
+	<bean id="operateRedisAndDataBaseDao" class="com.alibaba.otter.canal.example.OperateRedisAndDataBaseDao">
+	</bean>
+	&lt;!&ndash; 配置activemq交给spring容器管理  name="brokerURL" &ndash;&gt;
+    &lt;!&ndash; 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供 &ndash;&gt;
+    <bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://127.0.0.1:61616" />
+    </bean>
+    <bean id="connectionFactory"
+          class="org.springframework.jms.connection.SingleConnectionFactory">
+        <property name="targetConnectionFactory" ref="targetConnectionFactory" />
+    </bean>
+    &lt;!&ndash;这个是队列目的地，点对点的 &ndash;&gt;
+    <bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg>
+            <value>queue</value>
+        </constructor-arg>
+    </bean>
+    &lt;!&ndash;这个是主题目的地，一对多的 &ndash;&gt;
+    <bean id="topicDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="topic" />
+    </bean>
+
+    &lt;!&ndash; 消息监听容器 &ndash;&gt;
+    <bean id="jmsContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="queueDestination" />
+       &lt;!&ndash; <property name="messageListener" ref="myMessageListener" />&ndash;&gt;
+    </bean>-->
+</beans>
